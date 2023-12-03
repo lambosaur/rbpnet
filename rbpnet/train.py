@@ -73,7 +73,7 @@ def train(
     dataspec,
     config,
     output,
-    val_data=[],
+    val_data=None,
     model=RBPNet,
     epochs=100,
     batch_size=128,

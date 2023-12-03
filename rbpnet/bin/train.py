@@ -21,7 +21,8 @@ def main(train_data, validation_data, config, dataspec, output):
         gin.parse_config_file(config)
 
     # launch training
-    train(list(train_data), dataspec, config, output, val_data=list(validation_data))
+    val_data = list(validation_data) if validation_data is not None else None
+    train(list(train_data), dataspec, config, output, val_data=val_data)
 
 
 # %%
