@@ -30,7 +30,7 @@ def model_summary_to_file(model, fname):
 # %%
 def make_callbacks(root_path):
     tensorboard_cb = tf.keras.callbacks.TensorBoard(
-        log_dir=str(root_path), histogram_freq=1
+        log_dir=str(root_path / "tensorboard"), histogram_freq=1
     )
     csv_cb = tf.keras.callbacks.CSVLogger(str(root_path / "history.csv"))
     return [tensorboard_cb, csv_cb]
