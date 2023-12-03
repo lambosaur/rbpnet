@@ -18,8 +18,8 @@ def multinomial_loss(true_counts, logits, post_fn=None):
     Compute the multinomial negative log-likelihood along the sequence (axis=1).
 
     Args:
-        true_counts: observed count values (batch, seqlen, channels)
-        logits: predicted logit values (batch, seqlen, channels)
+      true_counts: observed count values (batch, seqlen, channels)
+      logits: predicted logit values (batch, seqlen, channels)
     """
 
     # expected shape: (batch_size, input_length)
@@ -29,26 +29,14 @@ def multinomial_loss(true_counts, logits, post_fn=None):
     true_counts = tf.cast(true_counts, tf.float32)
     logits = tf.cast(logits, tf.float32)
 
-    # Replace NaN values with zeros
-    true_counts = tf.where(
-        tf.math.is_finite(true_counts), true_counts, tf.zeros_like(true_counts)
-    )
-    logits = tf.where(tf.math.is_finite(logits), logits, tf.zeros_like(logits))
-
     total_counts = tf.reduce_sum(true_counts, axis=-1)
 
     # expected shape: (batch_size, )
     tf.debugging.assert_rank(total_counts, 1)
 
     dist = tfp.distributions.Multinomial(total_count=total_counts, logits=logits)
-    # Replace NaN values with zeros in the log_prob calculation
-    log_prob = tf.where(
-        tf.math.is_finite(dist.log_prob(true_counts)),
-        dist.log_prob(true_counts),
-        tf.zeros_like(true_counts),
-    )
 
-    loss = -tf.reduce_mean(log_prob)
+    loss = -tf.reduce_mean(dist.log_prob(true_counts))
     if post_fn is not None:
         loss = post_fn(loss)
 
