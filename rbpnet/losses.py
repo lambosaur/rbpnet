@@ -26,17 +26,26 @@ def multinomial_loss(true_counts, logits, post_fn=None):
     tf.debugging.assert_rank(logits, 2)
     tf.debugging.assert_rank(true_counts, 2)
 
+
     true_counts = tf.cast(true_counts, tf.float32)
     logits = tf.cast(logits, tf.float32)
 
+    # Replace NaN values with zeros
+    true_counts = tf.where(tf.math.is_finite(true_counts), true_counts, 0.0)
+    logits = tf.where(tf.math.is_finite(logits), logits, 0.0)
+
     total_counts = tf.reduce_sum(true_counts, axis=-1)
 
-    # expected shape: (batch_size, )
+    # Assertions for total_counts
     tf.debugging.assert_rank(total_counts, 1)
 
     dist = tfp.distributions.Multinomial(total_count=total_counts, logits=logits)
 
-    loss = -tf.reduce_mean(dist.log_prob(true_counts))
+    # Replace NaN values with zeros in the log_prob calculation
+    log_prob = tf.where(tf.math.is_finite(dist.log_prob(true_counts)), dist.log_prob(true_counts), 0.0)
+
+    loss = -tf.reduce_mean(log_prob)
+
     if post_fn is not None:
         loss = post_fn(loss)
 
