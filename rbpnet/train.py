@@ -173,6 +173,7 @@ def train(
 
     # save best validation loss result
     if val_data is not None:
+        print("Saving best validation loss result...")
         min_val_loss = str(round(min(history.history["val_loss"]), 4))
-        with open(str(output / "result"), "w") as f:
+        with open(str(output / "result.txt"), "w") as f:
             print(min_val_loss, end="", file=f)
